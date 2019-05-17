@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>认证</title>
+    <meta charset="gbk" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      data-hid="description"
+      name="description"
+      content="微云间认证计费系统,认证,计费,无线,pppoe"
+    />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <p>认证中...</p>
+    <script src="./wyj-sdk.min.js"></script>
+    <script>
+      // { ip, mac, url, params, method }
+      function parseQuery(query) {
+        var list = {},
+          rc = query
+
+        rc &&
+          rc.split('&').forEach(function(query) {
+            var parts = query.split('=')
+            list[parts.shift().trim()] = decodeURIComponent(parts.join('='))
+          })
+
+        return list
+      }
+
+      var querys = parseQuery(location.search.slice(1))
+      var redirectUrl = querys.redirect
+      var urlQuery = querys.url.split('?')
+      var url = urlQuery[0]
+      // var query = parseQuery(urlQuery[1])
+
+      if (redirectUrl.indexOf('?')) {
+        redirectUrl += '&disableAutopass=1'
+      } else {
+        redirectUrl += '?disableAutopass=1'
+      }
+
+      console.log(url, urlQuery[1])
+      $wyj.Portal.auth.vendors
+        .http({ url, params: urlQuery[1] })
+        .then(function(res) {
+          console.log(res)
+          if (res.ret === 1) {
+            alert('认证失败' + res.msg)
+          }
+
+          location.href = redirectUrl
+        })
+        .catch(() => {
+          alert('认证失败')
+          location.href = redirectUrl
+        })
+    </script>
+  </body>
+</html>

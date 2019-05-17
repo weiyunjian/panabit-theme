@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=GB2312">
+<meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<script src="./js/core.js"></script>
+<link href="./css/login.css" rel="stylesheet">
+</head>
+<body>
+<div class="login" id="login">
+	<div id="qrlogin_step2" class="qrlogin_step2" style="display: block;">
+		<div class="step2_outer_pc">
+			<span class="step2_success_pc"></span>
+			<div class="step2_msgbox"><div class="qr_h3">登陆成功，您现在可以开始上网了。</div>
+			<div class="goBack">点击这里 <a id="openwww" href="javascript:void(0);">打开</a> 网页<span id="autotime" style="color: green;"></span></div>
+			<a id="logout" href="logout.html" target="_blank" style="display:none;"> </a>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+window.onload = function()
+{
+	var url = "www.baidu.com"; 
+	var p, i, node;
+	if(location.href.search(/\?/) != -1) {
+		p = location.href.substr(location.href.search(/\?/)+1).split("&");
+		for(i = 0; i < p.length; i++) {
+			node = p[i].split('=');
+			if(node[0] == 'url' && node[1] != '') {
+				url = decodeURIComponent(node[1]);
+				break;
+			}
+		}
+	}
+
+	if(url.indexOf('http') != 0)
+		url = 'http://' + url;
+	$('openwww').onclick = function () {
+		$('logout').click();
+		window.location.href = url;
+	}
+	$.css.show($('qrlogin_step2'));
+	$('autotime').innerText = '（3秒后自动跳转）';
+	$('autotime').setAttribute('timeout', 3);
+	setTimeout(function (){
+		var s = parseInt($('autotime').getAttribute('timeout')) - 1;
+		$('autotime').setAttribute('timeout', s);
+		$('autotime').innerText = '（'+s+'秒后自动跳转）';
+		if(s <= 0)
+			$('openwww').onclick();
+		else 
+			setTimeout(arguments.callee, 1000);
+	}, 1000);
+}
+</script>
+</body></html>

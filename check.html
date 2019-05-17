@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=GB2312">
+<meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<script src="./js/core.js"></script>
+<link href="./css/login.css" rel="stylesheet">
+</head>
+<body>
+<div class="login" id="logout" style="margin: 0 auto;">
+	<div id="qrlogin_step2" class="qrlogin_step2" style="display: block;">
+		<div class="step2_outer_pc" style="margin-top: 8px;">
+			<div class="step3_logout_pc" id="msg_ico">
+				<img style="margin-top: 42px;" src="img/loading.gif">
+			</div>
+			<div class="step2_msgbox" id="msg_itme1">
+				<div class="qr_h3">登陆中，请稍后<span id="dtxt">……</span></div>
+			</div>
+			<div class="step2_msgbox" id="msg_itme2" style="display: none">
+				<div class="qr_h3" id="msgbox" style="width: 360px;">登陆失败！</div>
+				<div class="goBack">点击这里 <a id="closewin" href="javascript:void(0);">关闭</a> 后重新登陆<span id="autotime" style="color: green;"></span></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+var pos = window.location.href.indexOf(window.document.location.pathname);
+var ajax_cgi_host = window.location.href.substring(0, pos).replace('8080','8010');
+
+window.onload = function()
+{
+	var tmid, x = 1, p = '';
+	if(location.href.search(/\?/) != -1) {
+		p = location.href.substr(location.href.search(/\?/));
+	}
+
+	function checkself() {
+		var txt = '';
+		for(var i = 0; i < x; i++)
+			txt += '…';
+
+		$('dtxt').innerText = txt;
+		if(x >= 2)
+			x = 1;
+		else
+			x++;
+
+		$.http.post(
+			ajax_cgi_host + '/cgi-bin/webauth/ajax_webauth' + p,
+			{action: 'radius'},
+			function (d) {
+				if(typeof d != "object") {
+					return;
+				}
+				clearInterval(tmid);
+				if(d.ret == 0) {
+					location.href = 'logout.html' + p;
+					return;
+				}
+
+				if(d.msg != '')
+					$('msgbox').innerText = d.msg;
+
+				var e = $('msg_ico');
+				e.innerHTML = '';
+				e.className = 'step2_fail_pc';
+				$('msg_itme1').style.display = 'none';
+				$('msg_itme2').style.display = '';
+			}
+		);
+	}
+
+	tmid = setInterval(checkself, 1500);
+}
+
+$('closewin').onclick = function (){
+	window.opener = null;  
+	window.open('','_self');  
+	window.close();
+}
+</script>
+</body></html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+	<meta name="viewport"
+		content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<script>
+		var _win = null;
+		var _qs = '', _url = 'https://www.baidu.com'; _ip = '', _mac = '', _openwx = '', _poplogout = 0, _type = 17;
+		var p, i, node;
+
+		if ((p = location.href.search(/\?/)) != -1)
+			_qs = location.href.substr(p);
+		if ((p = _qs.search(/iarmdst=/)) != -1) {
+			_url = _qs.substr(p + 8);
+			if (_url.indexOf('http') != 0)
+				_url = 'http://' + _url;
+			_qs = _qs.substr(0, p - 1);
+		}
+		_qs = _qs.replace('clientip', 'ip').replace('clientmac', 'mac');
+		if (_qs != '') {
+			p = _qs.substr(1).split("&");
+			for (i = 0; i < p.length; i++) {
+				node = p[i].split('=');
+				if (node[0] == 'ip') {
+					_ip = node[1];
+				} else if (node[0] == 'mac') {
+					_mac = node[1];
+				} else if (node[0] == 'openwx') {
+					_openwx = node[1];
+				} else if (node[0] == 'type') {
+					_type = parseInt(node[1]);
+				}
+			}
+		}
+		location.href = 'https://portal.ik.weiyunjian.com/v3/wyj_5cd8d68ecba9e?ip=' + _ip + '&mac=' + _mac;
+	</script>
+
+<body>
+	<h1>?????...</h1>
+</body>
+
+</html>

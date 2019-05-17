@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=GB2312">
+<meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<script src="./js/core.js"></script>
+<script src="./js/QRCode.js"></script>
+<link href="./css/login.css" rel="stylesheet">
+</head>
+<body>
+<div class="login" id="login">
+	<div id="header" class="header">
+		<div class="switch" id="switch" style="left: 120px;">
+			<a class="switch_btn_focus" hidefocus="true" href="javascript:void(0);">修改帐号密码</a>
+		</div>
+	</div>
+	<div class="other_login" id="other_login">
+		<div id="loginTips" class="loginTips" style="height: 0px;">
+		<div class="error_tips" id="error_tips">
+			<span class="error_logo" id="error_logo"></span>
+			<span class="err_m" id="err_m"></span>
+		</div>
+		<div class="loading_tips" id="loading_tips">
+			<span id="loading_wording">修改中</span>
+			<img id="loading_img" class="loading_img" src="./img/load.gif" align="absmiddle"></div>
+		</div>
+		<div class="qlogin" id="qlogin">
+			<div class="main__content-qrcode" id="qrcode_zone" style="text-align:center;margin:0px auto;height:200px;width:200px;"></div> 
+			<div class="split_line"></div>
+		</div>
+		<div class="plogin" id="plogin">
+			<div class="login_form">
+					<div class="uinArea" id="uinArea">
+						<label class="input_tips" id="uin_tips" for="u">被修改的帐号</label>
+						<div class="inputOuter">
+							<input type="text" class="inputstyle" id="u" name="u" value="" tabindex="1">
+							<span class="uin_icon"></span>
+							<a class="uin_del" id="uin_del" href="javascript:void(0);"></a>
+						</div>
+						<ul class="email_list" id="email_list"></ul>
+					</div>
+					<div class="pwdArea" id="pwdArea">
+						<label class="input_tips" id="pwd_tips" for="p">旧的密码</label>
+						<div class="inputOuter">
+							<input type="password" class="inputstyle password" id="p" name="p" value="" maxlength="16" tabindex="2">
+							<span class="p_icon"></span>
+						</div> 
+					</div>
+					<div class="pwdArea" id="npwdArea">
+						<label class="input_tips" id="npwd_tips" for="p">新的密码</label>
+						<div class="inputOuter">
+							<input type="password" class="inputstyle password" id="np" name="np" value="" maxlength="16" tabindex="3">
+							<span class="p_icon"></span>
+						</div> 
+					</div>
+					<div class="pwdArea" id="rpwdArea">
+						<label class="input_tips" id="rpwd_tips" for="p">再次确认密码</label>
+						<div class="inputOuter">
+							<input type="password" class="inputstyle password" id="rp" name="rp" value="" maxlength="16" tabindex="4">
+							<span class="p_icon"></span>
+						</div> 
+					</div>
+					<div class="submit" style="margin: 0px 10px;"> 
+						<a class="login_button_1" hidefocus="true" href="javascript:void(0);" style="float: left;">
+							<input type="button" tabindex="5" value="修 改" class="btn" id="login_button" disabled="true">
+						</a>
+						<a class="login_button_1" hidefocus="true" href="javascript:void(0);">
+							<input type="button" tabindex="6" value="返 回" class="btn" id="login_return" disabled="true">
+						</a>
+					</div>
+			</div>
+		</div> 
+	</div> 
+</div>
+<script type="text/javascript">
+var pos = window.location.href.indexOf(window.document.location.pathname);
+var ajax_cgi_host = window.location.href.substring(0, pos).replace('8080','8010');
+
+input_box = function(options) {
+	options.input.onfocus = function () {
+		$.css.removeClass(options.tipobj, 'input_tips');
+		$.css.addClass(options.tipobj, 'input_tips_focus');
+		this.parentNode.className = "inputOuter_focus";
+	}
+	options.input.onblur = function () {
+		$.css.removeClass(options.tipobj, 'input_tips_focus');
+		$.css.addClass(options.tipobj, 'input_tips');
+		this.parentNode.className = "inputOuter";
+	}
+	if(typeof options.delobj == 'object') {
+		options.delobj.onclick = function() {
+			options.input.value = '';
+			options.input.onchange();
+			options.input.focus();
+			$.css.hide(options.delobj);
+		}
+	}
+	options.input.onchange = function () {
+		if(this.value == '') {
+			$.css.show(options.tipobj);
+			if(typeof options.delobj == 'object')
+				$.css.hide(options.delobj);
+		} else {
+			$.css.hide(options.tipobj);
+			if(typeof options.delobj == 'object')
+				$.css.show(options.delobj);
+		}
+		var t = this.parentNode;
+		t.className = "inputOuter_focus"
+	}
+	options.input.onkeyup = options.input.onchange;
+    options.input.onmouseover = function () {
+        var t = this.parentNode;
+        "inputOuter_focus" == t.className || (t.className = "inputOuter_hover");
+	}
+    options.input.onmouseout = function () {
+        var t = this.parentNode;
+        "inputOuter_focus" == t.className || (t.className = "inputOuter");
+	}
+	if(typeof options.delobj == 'object') {
+		options.delobj.onmouseover = function () {
+			var t = this.parentNode;
+			"inputOuter_focus" == t.className || (t.className = "inputOuter_hover");
+		}
+		options.delobj.onmouseout = function () {
+			var t = this.parentNode;
+			"inputOuter_focus" == t.className || (t.className = "inputOuter");
+		}
+	}
+	options.lasterr = '';
+	options.focus = function() {
+		this.input.focus();
+	}
+	options.val = function() {
+		return this.input.value;
+	}
+	if(typeof check != 'function') {
+		this.check = function () {}
+	}
+	options.input.onchange();
+	return options;
+}
+
+function showtips(text, o) {
+	alert(text);
+	if(typeof o == 'object') {
+		o.focus();
+	}
+}
+function showacctpage(s) {
+	if(s) { 
+		$.css.show($('plogin'));
+		$.css.hide($('loading_tips'));
+	}
+	else { 
+		$.css.hide($('plogin'));
+		$.css.show($('loading_tips'));
+	}
+} 
+palogin  = {
+	input: {
+	u: new input_box({
+		input:$('u'), tipobj:$('uin_tips'), delobj:$('uin_del'),
+		check: function () {
+			if(this.val() == '') {
+				showtips('帐号不能为空！', this.input);
+				return false;
+			}
+			return true;
+		}
+	}),
+	p: new input_box({
+		input:$('p'), tipobj:$('pwd_tips'), delobj: 0,
+		check: function () {
+			if(this.val() == '') {
+				showtips('密码不能为空！', this.input);
+				return false;
+			}
+			return true;
+		}
+	}),
+	np: new input_box({
+		input:$('np'), tipobj:$('npwd_tips'), delobj: 0,
+		check: function () {
+			if(this.val() == '') {
+				showtips('密码不能为空！', this.input);
+				return false;
+			}
+			return true;
+		}
+	}),
+	rp: new input_box({
+		input:$('rp'), tipobj:$('rpwd_tips'), delobj: 0,
+		check: function () {
+			if(this.val() == '') {
+				showtips('密码不能为空！', this.input);
+				return false;
+			}
+			return true;
+		}
+	})},
+	check: function () {
+		var o, n;
+		for (n in palogin.input) {
+			o = palogin.input[n];
+			if(!o.check()) {
+				return false;
+			}
+		}
+		if(palogin.input.np.val() != palogin.input.rp.val()) {
+			alert('重复密码与新密码不一致！');
+			palogin.input.rp.focus();
+			return false;
+		}
+		return true;
+	},
+	init: function () {
+		var obj = $("login_button");
+		obj.onclick = function () {
+			if(palogin.check() == false)
+				return;
+			showacctpage(0);
+			$.http.post(
+			ajax_cgi_host + '/cgi-bin/webauth/ajax_webauth?user=' + $('u').value, 
+			{action: 'mdpwd', pwd:$('p').value, npwd: $('np').value},
+			function (d) {
+				if(typeof d != "object") {
+					showacctpage(1);
+					if(d != '') 
+						alert(d);
+					else
+						alert('修改失败！');
+					return;
+				}
+				showacctpage(1);
+				alert(d.msg);
+				if(d.ret) return ;
+				$("login_return").click();
+			}
+			);
+			return true;
+		}
+		obj.parentElement.removeAttribute("hidefocus")
+		obj.disabled = !1; 
+
+		var obj = $("login_return");
+		obj.onclick = function () {
+			var p = '';
+			if(location.href.search(/\?/) != -1) {
+				p = location.href.substr(location.href.search(/\?/));
+			}
+			window.location.href = './portal.html' + p;
+		}
+		obj.parentElement.removeAttribute("hidefocus")
+		obj.disabled = !1; 
+	}
+};
+
+palogin.init();
+</script>
+</body></html>
+

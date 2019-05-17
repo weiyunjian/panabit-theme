@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=GB2312">
+<meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<script src="./js/core.js"></script>
+<link href="./css/login.css" rel="stylesheet">
+</head>
+<body>
+<div class="login" id="logout" style="margin: 0 auto;">
+	<div id="qrlogin_step2" class="qrlogin_step2" style="display: block;">
+		<div class="step2_outer_pc" style="margin-top: 8px;">
+			<span class="step2_logout_pc"></span>
+			<div class="step2_msgbox">
+				<div class="qr_h3">关闭此窗口会退出帐号，直接退出 <a id="openwww" href="javascript:void(0);" style="color: red;">点此</a> 。</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+var pos = window.location.href.indexOf(window.document.location.pathname);
+var ajax_cgi_host = window.location.href.substring(0, pos).replace('8080','8010');
+
+function ajax_get(url, data, cb, type) {
+	var xhr = $.http.getXHR();
+	var para, o = "";
+	for (var r in data)
+		o += "&" + r + "=" + data[r];
+	para = o.substr(1);
+
+	xhr.open('GET', url, false);
+	xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=gb2312");
+	xhr.setRequestHeader("Accept", "text/html, application/xhtml+xml, */*"); 
+	return xhr.onreadystatechange = function () {
+		if(4 == xhr.readyState) {
+			if(xhr.status >= 200 && xhr.status < 300 || 304 === xhr.status || 404 === xhr.status || 1223 === xhr.status  || 0 === xhr.status) {
+				if("undefined" == typeof type && xhr.responseText) {
+					try  {
+						cb(eval("(" + xhr.responseText + ")"));
+					} catch (e) {
+						cb(xhr.responseText);
+					}
+				}
+				else
+					cb(xhr.responseText);
+			}
+			xhr = null;
+		} 
+	}, xhr.send(para), xhr;
+}
+
+function closewin(m)
+{
+	var p, i, node, ip = '', mac = '';
+	if(location.href.search(/\?/) != -1) {
+		p = location.href.substr(location.href.search(/\?/)+1).split("&");
+		for(i = 0; i < p.length; i++) {
+			node = p[i].split('=');
+			if(node[0] == 'ip') {
+				ip = node[1];
+			}
+			else
+			if(node[0] == 'mac') {
+				mac = node[1];
+			}
+		}
+	}
+	p = '&ip=' + ip + '&mac=' + mac;
+	ajax_get(
+		ajax_cgi_host + '/cgi-bin/webauth/ajax_webauth?action=logoff' + p,
+		{},
+		function (d) {
+			if(typeof d != "object") {
+				if(m == 0) reutrn;
+				if(d != '') 
+					alert(d);
+				else
+					alert('退出失败！');
+				return;
+			}
+			if(d.ret) {
+				alert(d.msg);
+				return;
+			}
+			if(m == 0) reutrn;
+			window.opener = null;  
+			window.open('','_self');  
+			window.close();
+		}
+	);
+}
+window.onload = function()
+{
+	$('openwww').onclick = function ()
+	{
+		if(typeof window.confirm == 'function') {
+			if(window.confirm('是否要退出帐号?') == false) return ;
+		}
+
+		closewin(1);
+	}
+}
+window.onbeforeunload = function (){
+	closewin(0);
+	return ;
+}
+</script>
+</body></html>
