@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>认证</title>
-    <meta charset="gbk" />
+    <title>auth</title>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      data-hid="description"
-      name="description"
-      content="微云间认证计费系统,认证,计费,无线,pppoe"
-    />
+    <meta data-hid="description" name="description" content="auth,pppoe" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   </head>
   <body>
-    <p>认证中...</p>
+    <p>loading...</p>
     <script src="./wyj-sdk.min.js"></script>
     <script>
       // { ip, mac, url, params, method }
@@ -41,20 +37,14 @@
         redirectUrl += '?disableAutopass=1'
       }
 
-      console.log(url, urlQuery[1])
-      $wyj.Portal.auth.vendors
-        .http({ url, params: urlQuery[1] })
+      $wyj.Portal.auth.vendors.http
+        .auth({ url, params: urlQuery[1] })
         .then(function(res) {
-          console.log(res)
-          if (res.ret === 1) {
-            alert('认证失败' + res.msg)
-          }
-
-          location.href = redirectUrl
+          location.href = decodeURIComponent(redirectUrl)
         })
         .catch(() => {
-          alert('认证失败')
-          location.href = redirectUrl
+          alert('Error')
+          location.href = decodeURIComponent(redirectUrl)
         })
     </script>
   </body>
